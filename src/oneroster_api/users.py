@@ -14,16 +14,27 @@ class User(BaseOneRosterModel["User"]):
     status: str | None
     role: str | None
     enabled: bool | None = Field(None, alias="enabledUser")
-    state_id: list | None = Field(None, alias="userIds")
+    state_id: int | None  # = Field(None, alias="userIds")
     first_name: str | None = Field(None, alias="givenName")
     last_name: str | None = Field(None, alias="familyName")
     middle_name: str | None = Field(None, alias="middleName")
+    preferred_first_name: str | None = Field(None, alias="preferredFirstName")
+    preferred_first_name: str | None = Field(None, alias="preferredLastName")
     email: str | None
     identifier: int | None
     grades: list | None
-    metadata: dict | None
 
     _resource_path: ClassVar[str] = "user"
+
+    @model_validator(mode="before")
+    def get_preferred_name(cls, values: Any) -> Any:
+        # print(values["metadata"])
+        if values["metadata"] is not None:
+            if values["metadata"]["preferredFirstName"] is not None:
+                values["preferredFirstName"] = values["metadata"]["preferredFirstName"]
+            if values["metadata"]["preferredLastName"] is not None:
+                values["preferredLastName"] = values["metadata"]["preferredLastName"]
+        return values
 
     @model_validator(mode="after")
     def extract_grade(cls, values: Any) -> Any:
@@ -32,20 +43,16 @@ class User(BaseOneRosterModel["User"]):
             values.grades = values.grades[0]
         return values
 
-    @model_validator(mode="after")
+    @model_validator(mode="before")
     def extract_state_id(cls, values: Any) -> Any:
         """Returns the state id from dict."""
-        if values.role == "student":
-            data = values.state_id
-            if isinstance(data, list):
-                for item in data:
-                    if isinstance(item, dict) and item["type"] == "SSID":
-                        values.state_id = item.get("identifier")
-        elif values.role == "teacher":
-            data = values.metadata
-            if isinstance(data, dict):
-                values.state_id = data.get("stateId")
-        else:
-            values.state_id = None
+        values["state_id"] = None
+        if values["role"] == "student":
+            for item in values["userIds"]:
+                if item["type"] == "SSID":
+                    values["state_id"] = item["identifier"]
+        elif values["role"] == "teacher":
+            if values["metadata"]["stateId"] is not None:
+                values["state_id"] = values["metadata"]["stateId"]
 
         return values
