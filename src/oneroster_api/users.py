@@ -19,7 +19,7 @@ class Users(BaseOneRosterModel["Users"]):
     last_name: str | None = Field(None, alias="familyName")
     middle_name: str | None = Field(None, alias="middleName")
     preferred_first_name: str | None = Field(None, alias="preferredFirstName")
-    preferred_first_name: str | None = Field(None, alias="preferredLastName")
+    preferred_last_name: str | None = Field(None, alias="preferredLastName")
     email: str | None
     identifier: int | None
     grades: list | None
