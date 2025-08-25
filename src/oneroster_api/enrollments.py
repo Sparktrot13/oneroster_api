@@ -5,7 +5,7 @@ from pydantic import Field, model_validator
 from .base_api import BaseOneRosterModel
 
 
-class Enrollment(BaseOneRosterModel["Enrollment"]):
+class Enrollments(BaseOneRosterModel["Enrollments"]):
     role: str | None
     user: dict | None
     class_id: dict | None = Field(None, alias="class")

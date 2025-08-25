@@ -7,7 +7,7 @@ from pydantic import Field, model_validator
 from .base_api import BaseOneRosterModel
 
 
-class User(BaseOneRosterModel["User"]):
+class Users(BaseOneRosterModel["Users"]):
     """User Object."""
 
     username: int | None
