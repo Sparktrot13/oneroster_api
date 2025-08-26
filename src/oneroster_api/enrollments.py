@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import ClassVar
 
 from pydantic import Field, model_validator
@@ -26,4 +27,15 @@ class Enrollments(BaseOneRosterModel["Enrollments"]):
         data = values.user
         if isinstance(data, dict):
             values.user = data.get("sourcedId")
+        return values
+
+    @model_validator(mode="after")
+    def get_date_from_datetime(cls, values):
+        begin_iso = datetime.fromisoformat(values.begin_date)
+        end_iso = datetime.fromisoformat(values.begin_date)
+        begin_date = begin_iso.date()
+        end_date = end_iso.date()
+        values.begin_date = begin_date.isoformat()
+        values.end_date = end_date.isoformat()
+
         return values
